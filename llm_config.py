@@ -7,7 +7,7 @@ from langchain_openai import ChatOpenAI
 # cargar variables de entorno
 load_dotenv()
 
-def get_llm(usar_api=False, params=None):
+def get_llm(llm="dsk" , params=None):
     """
     Devuelve un modelo LLM configurado.
     
@@ -19,20 +19,19 @@ def get_llm(usar_api=False, params=None):
     """
     
     default_params = {
-        "temperature": None, # Aleatoriedad del modelo.
+        "temperature": 1, # Aleatoriedad del modelo.
         "max_tokens": 50, # Longitud de la respuesta en DeepSeek
-        "top_p": None, # diversidad de palabras considerando la probabilidad acumulada (no usar junto con temperature).
-        "top_k": None, # Diversidad de palabras considerando la frecuencia 
-        "frequency_penalty": None, # Penalizacion de frecuencia - DeepSeek
-        "presence_penalty": None, # Penalizacion de presencia - DeepSeek
-        "repeat_penalty": None # Penalizacion de repeticion - Ollama
-
+        "top_p": 1, # diversidad de palabras considerando la probabilidad acumulada (no usar junto con temperature).
+        "top_k": 40, # Diversidad de palabras considerando la frecuencia 
+        "frequency_penalty": 0, # Penalizacion de frecuencia - DeepSeek
+        "presence_penalty": 0, # Penalizacion de presencia - DeepSeek
+        "repeat_penalty": 1.1 # Penalizacion de repeticion - Ollama
     }
 
     if params:
         default_params.update(params)
     
-    if usar_api:
+    if llm == "dsk":
         # DeepSeek
         return ChatOpenAI(
             model="deepseek-chat", 
@@ -45,12 +44,13 @@ def get_llm(usar_api=False, params=None):
             presence_penalty=default_params["presence_penalty"]
         )
 
-    else:
+    elif llm == "oll":
         # Ollama
         return OllamaLLM(
             model="qwen:4b",
             temperature=default_params["temperature"],
             num_predict=default_params["max_tokens"],
             top_p=default_params["top_p"],
-            top_k=default_params["top_k"]
+            top_k=default_params["top_k"],
+            repeat_penalty=default_params["repeat_penalty"]
         )
